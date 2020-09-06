@@ -31,11 +31,27 @@ class BlockchainTest extends TestCase
         $blockchain = new Blockchain();
 
         //when
-        $block = new Block(0, 123);
+        $block = new Block();
         $blockchain->addBlock($block);
 
         //then
-        $lastBlock = $blockchain->getLastBlock();
         $this->assertEquals(2, $blockchain->blocksAmount());
     }
+
+    /**
+     * @test
+     */
+    public function shouldChainBeValid()
+    {
+        //given
+        $blockchain = new Blockchain();
+
+        //when
+        $blockchain->addBlock(new Block());
+        $blockchain->addBlock(new Block());
+
+        //then
+        $this->assertTrue($blockchain->isChainValid());
+    }
+
 }
