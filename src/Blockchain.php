@@ -10,12 +10,18 @@ class Blockchain
 
     /** @var Block[] */
     protected $chain = [];
-    protected $difficult = 2;
+    protected $blockMining;
 
-    public function __construct()
+    public function __construct(BlockMining $blockMining, array $chain = [])
     {
-        $genesisBlock = $this->createGenesisBlock();
-        $this->chain = [$genesisBlock];
+        $this->blockMining = $blockMining;
+        $this->chain = $chain;
+
+        if (!$chain) {
+            $genesisBlock = $this->createGenesisBlock();
+            $genesisBlock->setHash($blockMining->calculateHash($genesisBlock));
+            $this->chain = [$genesisBlock];
+        }
     }
 
     public function addBlock(Block $newBlock)
@@ -23,7 +29,7 @@ class Blockchain
         $previousBlock = $this->getLastBlock();
         $newBlock->setPreviousHash($previousBlock->getHash());
         $newBlock->setIndex($previousBlock->getIndex() + 1);
-        $newBlock->mineBlock($this->difficult);
+        $this->blockMining->mineBlock($newBlock);
 
         $this->chain[] = $newBlock;
     }
@@ -36,6 +42,11 @@ class Blockchain
     public function getLastBlock(): Block
     {
         return Collection::make($this->chain)->last();
+    }
+
+    public function getChain(): array
+    {
+        return $this->chain;
     }
 
     public function isChainValid(): bool

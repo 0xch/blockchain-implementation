@@ -4,7 +4,8 @@
   "description": "",
   "require": {
     "php": ">=7.1.0",
-    "tightenco/collect": "^7.26"
+    "tightenco/collect": "^7.26",
+    "symfony/console": "^4.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.5"
@@ -12,6 +13,11 @@
   "autoload": {
     "psr-4": {
       "Blockchain\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
     }
   }
 }

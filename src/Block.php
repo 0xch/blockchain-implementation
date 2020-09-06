@@ -4,9 +4,7 @@ namespace Blockchain;
 
 class Block
 {
-    const ALGORITHM = 'sha256';
-    const VALUE_TO_COMPARE_BLOCK = '0000000000000000000000000000000000000000000000000000000000000000'; //64x for sha256
-
+    protected $version = 1;
     protected $index = 0;
     protected $nonce = 0;
     protected $previousHash;
@@ -17,41 +15,41 @@ class Block
     {
         $timestamp = time();
         $this->timestamp = $timestamp;
-        $this->hash = $this->calculateHash();
     }
 
-    protected function calculateHash()
+    public static function createFromFields(array $fields): Block
     {
-        $blockContent = $this->index . $this->nonce . $this->previousHash . $this->timestamp;
+        $block = new Block();
+        $block->setVersion($fields[0]);
+        $block->setIndex($fields[1]);
+        $block->setNonce($fields[2]);
+        $block->setPreviousHash($fields[3]);
+        $block->setTimestamp($fields[4]);
+        $block->setHash($fields[5]);
 
-        return hash(self::ALGORITHM, $blockContent);
+        return $block;
     }
 
-    public function mineBlock(int $difficult)
+    public function toFields(): array
     {
-        $hash = $this->hash;
-        $hash = $this->miningAlgorithm($hash, $difficult);
-        $this->hash = $hash;
+        return [
+            $this->version,
+            $this->index,
+            $this->nonce,
+            $this->previousHash,
+            $this->timestamp,
+            $this->hash
+        ];
     }
 
-    private function miningAlgorithm(string $hash, int $difficult): string
+    public function getVersion(): int
     {
-        while ($this->hashPart($hash, $difficult) !== $this->hashPart(self::VALUE_TO_COMPARE_BLOCK, $difficult)) {
-            $this->nonce++;
-            $hash = $this->calculateHash();
-        }
-
-        return $hash;
+        return $this->version;
     }
 
-    private function hashPart(string $hash, int $difficult): string
+    public function setVersion(int $version): void
     {
-        return substr($hash, 0, $difficult);
-    }
-
-    public function setPreviousHash(string $previousHash): void
-    {
-        $this->previousHash = $previousHash;
+        $this->version = $version;
     }
 
     public function getIndex(): int
@@ -64,9 +62,34 @@ class Block
         $this->index = $index;
     }
 
-    public function getTimestamp(): string
+    public function getNonce(): int
+    {
+        return $this->nonce;
+    }
+
+    public function setNonce(int $nonce): void
+    {
+        $this->nonce = $nonce;
+    }
+
+    public function getPreviousHash(): string
+    {
+        return $this->previousHash;
+    }
+
+    public function setPreviousHash($previousHash): void
+    {
+        $this->previousHash = $previousHash;
+    }
+
+    public function getTimestamp(): int
     {
         return $this->timestamp;
+    }
+
+    public function setTimestamp(int $timestamp): void
+    {
+        $this->timestamp = $timestamp;
     }
 
     public function getHash(): string
@@ -74,8 +97,8 @@ class Block
         return $this->hash;
     }
 
-    public function getPreviousHash(): string
+    public function setHash($hash): void
     {
-        return $this->previousHash;
+        $this->hash = $hash;
     }
 }
